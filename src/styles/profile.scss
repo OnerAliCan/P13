@@ -1,0 +1,25 @@
+.profile-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #12002b;
+  align-items: center;
+
+  h1 {
+    color: white;
+  }
+
+  .edit-button {
+    border-color: #00bc77;
+    background-color: #00bc77;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px;
+    height: 40px;
+    width: 93px;
+  }
+
+  .account {
+    background-color: #fff;
+  }
+}

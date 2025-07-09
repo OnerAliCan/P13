@@ -1,3 +1,3 @@
 export default function EditNameButton() {
-  return <button class="edit-button">Edit Name</button>
+  return <button className="edit-button">Edit Name</button>
 }
