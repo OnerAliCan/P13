@@ -2,10 +2,17 @@ import '../styles/profile.scss'
 import '../styles/main.scss'
 import EditNameButton from '../components/EditNameButton'
 import TransactionCard from '../components/TransactionCard'
+import useAuth from '../hooks/useAuth'
 
 function Profile() {
-  const firstName = 'Tony'
-  const lastName = 'Jarvis'
+  const { user, isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) {
+    return <p>Vous devez être connecté pour voir cette page.</p>
+  }
+
+  const firstName = user?.firstName || ''
+  const lastName = user?.lastName || ''
 
   return (
     <>

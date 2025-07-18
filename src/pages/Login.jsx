@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { login } from '../redux/authSlice' // adapte le chemin si besoin
+import { login, setUser } from '../redux/authSlice' // adapte le chemin si besoin
 import { useNavigate } from 'react-router-dom'
 
 function Login() {
@@ -19,14 +19,33 @@ function Login() {
       })
       if (!response.ok) throw new Error('Login failed')
       const data = await response.json()
-      console.log('Token reçu :', data.token)
-      // dispatch l’action pour stocker le token et set isAuthenticated
-      // dispatch(login({ token: data.token }))
+      console.log("ici c'est la data", data.body)
+      const token = data.body.token
+      localStorage.setItem('token', token)
+      dispatch(login({ token }))
 
-      // redirige vers profile
-      // navigate('/profile')
+      const profileResponse = await fetch(
+        'http://localhost:3001/api/v1/user/profile',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({}),
+        },
+      )
+
+      const profileData = await profileResponse.json()
+      const user = profileData.body
+
+      dispatch(setUser(user))
+      localStorage.setItem('user', JSON.stringify(user))
+
+      console.log('profile response il est la', profileResponse)
+
+      navigate('/profile')
     } catch (error) {
-      // alert(error.message)
       console.error('Erreur login :', error.message)
     }
   }

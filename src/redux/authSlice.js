@@ -3,25 +3,26 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
   isAuthenticated: false,
   user: null,
+  token: null,
 }
 
 const authSlice = createSlice({
-  name: 'auth', // Nom de la slice, utilisé dans Redux pour l’identifier
-  initialState, // Etat initial défini ci-dessus
+  name: 'auth',
+  initialState,
 
   reducers: {
-    // - marque l'utilisateur comme connecté
-    // - stocke les données utilisateur passées dans action.payload
     login: (state, action) => {
       state.isAuthenticated = true
-      state.user = action.payload
+      state.token = action.payload.token
+      if (action.payload.user) {
+        state.user = action.payload.user
+      }
     },
 
-    // Reducer "logout" :
-    // - remet l’état à la base (déconnecté, sans infos utilisateur)
     logout: (state) => {
       state.isAuthenticated = false
       state.user = null
+      state.token = null
     },
 
     setUser: (state, action) => {
@@ -30,8 +31,6 @@ const authSlice = createSlice({
   },
 })
 
-// exporte les actions "login" et "logout" pour pouvoir les utiliser ailleurs
 export const { login, logout, setUser } = authSlice.actions
 
-// exporte le reducer qui sera utilisé dans le store Redux
 export default authSlice.reducer

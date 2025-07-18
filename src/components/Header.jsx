@@ -4,7 +4,6 @@ import { Link, useLocation } from 'react-router-dom'
 export default function Header({ firstName, isAuthenticated }) {
   const location = useLocation()
   const isOnProfilePage = location.pathname === '/profile'
-
   return (
     <header>
       <nav className="main-nav">
