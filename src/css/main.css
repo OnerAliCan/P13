@@ -256,10 +256,12 @@ body #root .content .main {
 }
 
 .banner {
+  margin: 0 auto;
   margin-bottom: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 80%;
 }
 .banner h1 {
   color: #fff;
@@ -286,6 +288,9 @@ body #root .content .main {
   }
   .transaction-button {
     width: 200px;
+  }
+  .banner {
+    width: auto;
   }
 }
 

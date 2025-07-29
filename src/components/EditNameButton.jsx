@@ -1,3 +1,7 @@
-export default function EditNameButton() {
-  return <button className="edit-button">Edit Name</button>
+export default function EditNameButton({ setIsEditing }) {
+  return (
+    <button className="edit-button" onClick={() => setIsEditing(true)}>
+      Edit Name
+    </button>
+  )
 }
