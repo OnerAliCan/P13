@@ -1,17 +1,37 @@
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { login, setUser } from '../redux/authSlice' // adapte le chemin si besoin
 import { useNavigate } from 'react-router-dom'
 
-function Login() {
+export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [rememberMe, setRememberMe] = useState(false)
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+
+  //verifie si on a déjà un token stocké
+  useEffect(() => {
+    const token =
+      localStorage.getItem('token') || sessionStorage.getItem('token')
+
+    const user = localStorage.getItem('user') || sessionStorage.getItem('user')
+
+    if (token || user) {
+      dispatch(login({ token }))
+      dispatch(setUser(JSON.parse(user)))
+      navigate('/profile')
+    }
+    if (isAuthenticated) {
+      navigate('/profile')
+    }
+  }, [dispatch, isAuthenticated, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      // Login
       const response = await fetch('http://localhost:3001/api/v1/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -19,11 +39,9 @@ function Login() {
       })
       if (!response.ok) throw new Error('Login failed')
       const data = await response.json()
-      console.log("ici c'est la data", data.body)
       const token = data.body.token
-      localStorage.setItem('token', token)
-      dispatch(login({ token }))
 
+      // Récupération du profil
       const profileResponse = await fetch(
         'http://localhost:3001/api/v1/user/profile',
         {
@@ -35,15 +53,24 @@ function Login() {
           body: JSON.stringify({}),
         },
       )
-
       const profileData = await profileResponse.json()
       const user = profileData.body
 
+      // Stockage avec remember me
+
+      if (rememberMe) {
+        localStorage.setItem('token', token)
+        localStorage.setItem('user', JSON.stringify(user))
+      } else {
+        sessionStorage.setItem('token', token)
+        sessionStorage.setItem('user', JSON.stringify(user))
+      }
+
+      // Mise à jour Redux
+      dispatch(login({ token }))
       dispatch(setUser(user))
-      localStorage.setItem('user', JSON.stringify(user))
 
-      console.log('profile response il est la', profileResponse)
-
+      // Navigation
       navigate('/profile')
     } catch (error) {
       console.error('Erreur login :', error.message)
@@ -63,7 +90,7 @@ function Login() {
               id="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-            />{' '}
+            />
           </div>
           <div className="input-wrapper">
             <label htmlFor="password">Password</label>
@@ -72,17 +99,21 @@ function Login() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-            />{' '}
+            />
           </div>
           <div className="input-remember">
-            <input type="checkbox" id="remember-me" />
+            <input
+              type="checkbox"
+              id="remember-me"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
             <label htmlFor="remember-me">Remember me</label>
           </div>
+
           <button className="sign-in-button">Sign In</button>
         </form>
       </section>
     </main>
   )
 }
-
-export default Login

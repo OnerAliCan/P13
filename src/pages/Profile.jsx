@@ -4,15 +4,20 @@ import EditNameButton from '../components/EditNameButton'
 import TransactionCard from '../components/TransactionCard'
 import useAuth from '../hooks/useAuth'
 import Edit from '../components/Edit'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Welcome from '../components/Welcome'
 
 function Profile() {
   const { user, isAuthenticated } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
+  const navigate = useNavigate()
 
-  if (!isAuthenticated) {
-    return <p>Vous devez être connecté pour voir cette page.</p>
-  }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login')
+    }
+  }, [isAuthenticated, navigate])
 
   const firstName = user?.firstName || ''
   const lastName = user?.lastName || ''
@@ -20,14 +25,11 @@ function Profile() {
     <>
       <main className="profile-main">
         <div className="banner">
-          <h1>
-            Welcome back <br />
-            {!isEditing && (
-              <>
-                {firstName} {lastName}!
-              </>
-            )}
-          </h1>
+          <Welcome
+            isEditing={isEditing}
+            firstName={firstName}
+            lastName={lastName}
+          />
 
           {isEditing ? (
             <Edit setIsEditing={setIsEditing} />
