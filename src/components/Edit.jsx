@@ -5,7 +5,7 @@ import { updateUserProfile } from '../thunks/updateUserProfile'
 
 function Edit({ setIsEditing }) {
   const dispatch = useDispatch()
-
+  const [error, setError] = useState(null)
   // récupère le token et l'utilisateur depuis Redux
   const token = useSelector((state) => state.auth.token)
   const user = useSelector((state) => state.auth.user)
@@ -14,9 +14,16 @@ function Edit({ setIsEditing }) {
   const [firstName, setFirstName] = useState(user?.firstName || '')
   const [lastName, setLastName] = useState(user?.lastName || '')
 
-  // enregistrer les modifications
+  // enregistrer les modifications et mise en place de la sécurité pour les noms
   const handleSave = async () => {
-    //envoyer la requete à Redux
+    const nameRegex = /^[A-Za-zÀ-ÿ-]{2,}$/
+    if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+      setError(
+        'Le prénom et le nom doivent contenir au moins 2 lettres et aucun caractère spécial.',
+      )
+      return
+    }
+
     try {
       const resultAction = await dispatch(
         updateUserProfile({ firstName, lastName, token }),
@@ -24,13 +31,16 @@ function Edit({ setIsEditing }) {
       // si la requete réussit, on met à jour le state via redux
       if (updateUserProfile.fulfilled.match(resultAction)) {
         dispatch(updateProfile({ firstName, lastName }))
+        const updatedUser = { ...user, firstName, lastName }
+        sessionStorage.setItem('user', JSON.stringify(updatedUser))
+
         setIsEditing(false)
       } else {
-        // gérer erreur si besoin
-        console.error('Erreur mise à jour profil')
+        setError('Impossible de mettre à jour le profil')
       }
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour :', error)
+    } catch (err) {
+      setError('Erreur lors de la mise à jour')
+      console.error(err)
     }
   }
 
@@ -41,16 +51,23 @@ function Edit({ setIsEditing }) {
           type="text"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
+          placeholder="Prénom"
         />
         <input
           type="text"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
+          placeholder="Nom"
         />
       </div>
+      {error && <p className="error">{error}</p>}
       <div className="edit-buttons">
-        <button onClick={handleSave}>Save</button>
-        <button onClick={() => setIsEditing(false)}>Cancel</button>
+        <button type="button" onClick={handleSave}>
+          Save
+        </button>
+        <button type="button" onClick={() => setIsEditing(false)}>
+          Cancel
+        </button>
       </div>
     </div>
   )
