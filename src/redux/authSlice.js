@@ -14,6 +14,7 @@ const authSlice = createSlice({
   initialState,
 
   reducers: {
+    // Action pour connecter un utilisateur
     login: (state, action) => {
       state.isAuthenticated = true
       state.token = action.payload.token
@@ -21,17 +22,17 @@ const authSlice = createSlice({
         state.user = action.payload.user
       }
     },
-
+    // Action pour déconnecter un utilisateur
     logout: (state) => {
       state.isAuthenticated = false
       state.user = null
       state.token = null
     },
-
+    // Mettre à jour les informations de l'utilisateur dans le state
     setUser: (state, action) => {
       state.user = action.payload
     },
-
+    // Mettre à jour le prénom et le nom de l'utilisateur
     updateProfile: (state, action) => {
       const { firstName, lastName } = action.payload
       if (state.user) {
@@ -40,6 +41,7 @@ const authSlice = createSlice({
       }
     },
   },
+  // Gérer les actions asynchrones
   extraReducers: (builder) => {
     builder
       .addCase(updateUserProfile.pending, (state) => {
@@ -60,20 +62,3 @@ const authSlice = createSlice({
 export const { login, logout, setUser, updateProfile } = authSlice.actions
 
 export default authSlice.reducer
-
-// const response = await fetch('http://localhost:3001/api/v1/user/profile', {
-//   method: 'PUT',
-//   headers: {
-//     Authorization: `Bearer ${token}`,
-//     'Content-Type': 'application/json',
-//   },
-//   body: JSON.stringify({ firstName, lastName }),
-// })
-
-//  if (!response.ok) {
-//     throw new Error('Erreur')
-//   } else {
-//     const data = await response.json()
-// }
-
-// return data.body

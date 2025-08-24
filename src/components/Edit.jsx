@@ -5,17 +5,23 @@ import { updateUserProfile } from '../thunks/updateUserProfile'
 
 function Edit({ setIsEditing }) {
   const dispatch = useDispatch()
+
+  // récupère le token et l'utilisateur depuis Redux
   const token = useSelector((state) => state.auth.token)
   const user = useSelector((state) => state.auth.user)
+
+  // états locaux pour firstname et lastname
   const [firstName, setFirstName] = useState(user?.firstName || '')
   const [lastName, setLastName] = useState(user?.lastName || '')
 
+  // enregistrer les modifications
   const handleSave = async () => {
+    //envoyer la requete à Redux
     try {
       const resultAction = await dispatch(
         updateUserProfile({ firstName, lastName, token }),
       )
-
+      // si la requete réussit, on met à jour le state via redux
       if (updateUserProfile.fulfilled.match(resultAction)) {
         dispatch(updateProfile({ firstName, lastName }))
         setIsEditing(false)

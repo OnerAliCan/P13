@@ -5,6 +5,7 @@ import SignInSignOut from './SignInSignOut'
 export default function Header({ firstName, isAuthenticated }) {
   const location = useLocation()
   const isOnProfilePage = location.pathname === '/profile'
+  const isOnHomePage = location.pathname === '/'
   return (
     <header>
       <nav className="main-nav">
@@ -17,7 +18,7 @@ export default function Header({ firstName, isAuthenticated }) {
           <h1 className="sr-only">Argent Bank</h1>
         </Link>
         <div>
-          {isOnProfilePage && isAuthenticated && (
+          {(isOnProfilePage || isOnHomePage) && isAuthenticated && (
             <Link className="main-nav-item" to="/profile">
               <i className="fa fa-user-circle"></i>
               {firstName}

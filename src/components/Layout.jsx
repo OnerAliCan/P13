@@ -7,19 +7,19 @@ import { login, setUser } from '../redux/authSlice'
 
 export default function Layout() {
   const dispatch = useDispatch()
+  //Récupérer l'utilisateur et son état d'authentification depuis Redux
   const user = useSelector((state) => state.auth.user)
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
-
-  // const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const localToken = localStorage.getItem('token')
     const localUser = localStorage.getItem('user')
-    console.log('localuser il est la ', localUser)
     if (!localToken) return
 
+    // Mettre à jour Redux pour dire que l'utilisateur est connecté
     dispatch(login({ token: localToken }))
 
+    // Si un utilisateur est stocké, on le parse et on met à jour Redux
     if (localUser) {
       try {
         const parsedUser = JSON.parse(localUser)
@@ -30,7 +30,7 @@ export default function Layout() {
       }
     }
 
-    // On synchronise avec l’API
+    // synchroniser avec l’API et récupérer les données à jour
     const fetchUserProfile = async () => {
       try {
         const response = await fetch(
@@ -49,6 +49,7 @@ export default function Layout() {
 
         const data = await response.json()
 
+        // Mise à jour Redux et stockage local avec les données récupérées
         dispatch(setUser(data.body))
         localStorage.setItem('user', JSON.stringify(data.body))
       } catch (error) {
